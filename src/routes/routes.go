@@ -2,12 +2,18 @@ package routes
 
 import (
 	"gintama/src/controllers"
+	"gintama/src/helpers"
 	"gintama/src/middlewares"
+	"gintama/src/models"
+	"gintama/src/repository"
+	"gintama/src/services"
 	"log"
 	"net/http"
 	"os"
 	"runtime"
 
+	helmet "github.com/danielkov/gin-helmet"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -27,11 +33,13 @@ func SetupRoutes() *gin.Engine {
 	}
 
 	// Using Middleware
-	r.Use(middlewares.CORSMiddleware())
+	r.Use(cors.Default())
+	r.Use(helmet.Default())
 	r.Use(middlewares.RequestIDMiddleware())
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
+			"code":      http.StatusOK,
 			"message":   "Gintama ( Rest API with Gin Golang )",
 			"maintaner": "masb0ymas, <n.fajri@outlook.com>",
 			"source":    "https://github.com/masb0ymas/gintama",
@@ -43,17 +51,26 @@ func SetupRoutes() *gin.Engine {
 	r.Static("/public", "./public")
 
 	r.GET("/v1", func(c *gin.Context) {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "forbidden, wrong access endpoint",
-		})
+		response := helpers.ErrorResponse(http.StatusForbidden, "forbidden, wrong access endpoint")
+		c.JSON(http.StatusForbidden, response)
 	})
+
+	db := models.GetDB()
+
+	// List Repository
+	roleRepository := repository.RoleRepository(db)
+
+	// List Service
+	roleService := services.RoleService(roleRepository)
+
+	// List Controller
+	roleController := controllers.RoleController(roleService)
 
 	// Grouping Routes
 	v1 := r.Group("/v1")
 	{
-		role := new(controllers.RoleController)
-
-		v1.GET("/role", role.GetAll)
+		v1.GET("/role", roleController.GetAll)
+		v1.POST("/role", roleController.CreateRole)
 	}
 
 	log.Printf("\n\n PORT: %s \n ENV: %s", os.Getenv("PORT"), os.Getenv("ENV"))
