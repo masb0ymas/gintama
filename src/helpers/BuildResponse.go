@@ -1,18 +1,16 @@
 package helpers
 
 type response struct {
-	Message string      `json:"message"`
 	Code    int         `json:"code"`
+	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
-	Total   int64       `json:"total"`
 }
 
-func BuildResponse(message string, code int, data interface{}, total int64) response {
+func BuildResponse(code int, message string, data interface{}) response {
 	jsonResponse := response{
-		Message: message,
 		Code:    code,
+		Message: message,
 		Data:    data,
-		Total:   total,
 	}
 
 	return jsonResponse
