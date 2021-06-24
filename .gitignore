@@ -7,8 +7,6 @@
 /storage
 /dist
 /build
-/public/uploads
-/public/dokumen
 
 # misc
 .DS_Store

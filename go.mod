@@ -3,8 +3,11 @@ module gintama
 go 1.15
 
 require (
+	github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.2
-	github.com/go-playground/validator/v10 v10.6.1 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/go-playground/validator/v10 v10.6.1
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/joho/godotenv v1.3.0
