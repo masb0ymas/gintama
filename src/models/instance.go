@@ -12,6 +12,16 @@ import (
 
 var DB *gorm.DB
 
+type Database struct {
+	*gorm.DB
+}
+
+type QueryFiltered struct {
+	Page     string
+	PageSize string
+	Order    string
+}
+
 func ConnectDatabase() {
 	// Load the .env file
 	errEnv := godotenv.Load()
@@ -38,4 +48,8 @@ func ConnectDatabase() {
 	database.AutoMigrate(&Role{})
 
 	DB = database
+}
+
+func GetDB() *gorm.DB {
+	return DB
 }
