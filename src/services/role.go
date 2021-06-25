@@ -8,6 +8,7 @@ import (
 
 type IService interface {
 	GetAll(queryFiltered models.QueryFiltered) ([]models.Role, int64, error)
+	FindById(input schema.RoleByIdSchema) (models.Role, error)
 	CreateRole(input schema.RoleSchema) (models.Role, error)
 }
 
@@ -27,6 +28,16 @@ func (s *service) GetAll(queryFiltered models.QueryFiltered) ([]models.Role, int
 	}
 
 	return data, total, nil
+}
+
+// Find By Id
+func (s *service) FindById(input schema.RoleByIdSchema) (models.Role, error) {
+	data, err := s.repository.FindById(input.ID)
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
 }
 
 // Create

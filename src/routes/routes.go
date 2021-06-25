@@ -13,7 +13,6 @@ import (
 	"runtime"
 
 	helmet "github.com/danielkov/gin-helmet"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -33,8 +32,8 @@ func SetupRoutes() *gin.Engine {
 	}
 
 	// Using Middleware
-	r.Use(cors.Default())
 	r.Use(helmet.Default())
+	r.Use(middlewares.CORSMiddleware())
 	r.Use(middlewares.RequestIDMiddleware())
 
 	r.GET("/", func(c *gin.Context) {
@@ -70,6 +69,7 @@ func SetupRoutes() *gin.Engine {
 	v1 := r.Group("/v1")
 	{
 		v1.GET("/role", roleController.GetAll)
+		v1.GET("/role/:id", roleController.FindById)
 		v1.POST("/role", roleController.CreateRole)
 	}
 

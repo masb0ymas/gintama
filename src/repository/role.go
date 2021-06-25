@@ -9,6 +9,7 @@ import (
 
 type IRepository interface {
 	GetAll(queryFiltered models.QueryFiltered) ([]models.Role, int64, error)
+	FindById(id int) (models.Role, error)
 	Create(role models.Role) (models.Role, error)
 }
 
@@ -38,7 +39,7 @@ func (r *repository) GetAll(queryFiltered models.QueryFiltered) ([]models.Role, 
 		Find(&data).Error
 
 	// total
-	r.db.Model(models.Role{}).Offset(0).Count(&count)
+	r.db.Model(models.Role{}).Count(&count)
 
 	if err != nil {
 		return data, count, err
@@ -47,13 +48,25 @@ func (r *repository) GetAll(queryFiltered models.QueryFiltered) ([]models.Role, 
 	return data, count, nil
 }
 
-// Create
-func (r *repository) Create(role models.Role) (models.Role, error) {
-	err := r.db.Create(&role).Error
+// Find By Id
+func (r *repository) FindById(id int) (models.Role, error) {
+	var data models.Role
 
+	err := r.db.Model(models.Role{}).Where("id = ?", id).First(&data).Error
 	if err != nil {
-		return role, err
+		return data, err
 	}
 
-	return role, nil
+	return data, nil
+}
+
+// Create
+func (r *repository) Create(data models.Role) (models.Role, error) {
+	err := r.db.Create(&data).Error
+
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
 }

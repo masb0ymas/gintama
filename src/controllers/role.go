@@ -27,7 +27,7 @@ func (h *roleController) GetAll(c *gin.Context) {
 
 	data, total, err := h.service.GetAll(queryFiltered)
 	if err != nil {
-		response := helpers.BuildResponse(http.StatusBadRequest, "error to get roles", nil)
+		response := helpers.ErrorResponse(http.StatusBadRequest, "error to get roles")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -37,6 +37,30 @@ func (h *roleController) GetAll(c *gin.Context) {
 
 	c.JSON(http.StatusOK, buildResponse)
 
+}
+
+// Find By Id
+func (h *roleController) FindById(c *gin.Context) {
+	var input schema.RoleByIdSchema
+
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		response := helpers.ErrorResponse(http.StatusBadRequest, "failed to get role")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data, err := h.service.FindById(input)
+	if err != nil {
+		response := helpers.ErrorResponse(http.StatusBadRequest, "data not found or has been deleted")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := gin.H{"data": data}
+	buildResponse := helpers.BuildResponse(http.StatusOK, "data has been received", response)
+
+	c.JSON(http.StatusOK, buildResponse)
 }
 
 // Create
@@ -55,7 +79,7 @@ func (h *roleController) CreateRole(c *gin.Context) {
 
 	data, err := h.service.CreateRole(input)
 	if err != nil {
-		response := helpers.BuildResponse(http.StatusBadRequest, "failed to create role", nil)
+		response := helpers.ErrorResponse(http.StatusBadRequest, "failed to create role")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
