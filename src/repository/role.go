@@ -12,6 +12,7 @@ type IRepository interface {
 	FindById(id int) (models.Role, error)
 	Create(role models.Role) (models.Role, error)
 	Update(role models.Role) (models.Role, error)
+	Delete(id int) error
 }
 
 type repository struct {
@@ -81,4 +82,15 @@ func (r *repository) Update(data models.Role) (models.Role, error) {
 	}
 
 	return data, nil
+}
+
+// Delete
+func (r *repository) Delete(id int) error {
+	err := r.db.Delete(&models.Role{}, id).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -120,3 +120,25 @@ func (h *roleController) Update(c *gin.Context) {
 	response := helpers.BuildResponse(http.StatusOK, "success to update role", updateData)
 	c.JSON(http.StatusOK, response)
 }
+
+// Delete
+func (h *roleController) Delete(c *gin.Context) {
+	var params schema.RoleByIdSchema
+
+	errUri := c.ShouldBindUri(&params)
+	if errUri != nil {
+		response := helpers.ErrorResponse(http.StatusBadRequest, "failed to get role")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err := h.service.Delete(params)
+	if err != nil {
+		response := helpers.ErrorResponse(http.StatusBadRequest, "data not found or has been deleted")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helpers.BuildResponse(http.StatusOK, "success to deleted role", nil)
+	c.JSON(http.StatusOK, response)
+}

@@ -11,6 +11,7 @@ type IService interface {
 	FindById(input schema.RoleByIdSchema) (models.Role, error)
 	CreateRole(input schema.RoleSchema) (models.Role, error)
 	Update(params schema.RoleByIdSchema, input schema.RoleSchema) (models.Role, error)
+	Delete(params schema.RoleByIdSchema) error
 }
 
 type service struct {
@@ -69,4 +70,14 @@ func (s *service) Update(params schema.RoleByIdSchema, input schema.RoleSchema) 
 	}
 
 	return updateData, nil
+}
+
+func (s *service) Delete(params schema.RoleByIdSchema) error {
+	err := s.repository.Delete(params.ID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
