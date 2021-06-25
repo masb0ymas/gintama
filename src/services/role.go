@@ -10,6 +10,7 @@ type IService interface {
 	GetAll(queryFiltered models.QueryFiltered) ([]models.Role, int64, error)
 	FindById(input schema.RoleByIdSchema) (models.Role, error)
 	CreateRole(input schema.RoleSchema) (models.Role, error)
+	Update(params schema.RoleByIdSchema, input schema.RoleSchema) (models.Role, error)
 }
 
 type service struct {
@@ -51,4 +52,21 @@ func (s *service) CreateRole(input schema.RoleSchema) (models.Role, error) {
 	}
 
 	return data, nil
+}
+
+// Update
+func (s *service) Update(params schema.RoleByIdSchema, input schema.RoleSchema) (models.Role, error) {
+	data, err := s.repository.FindById(params.ID)
+	if err != nil {
+		return data, err
+	}
+
+	data.Name = input.Name
+
+	updateData, err := s.repository.Update(data)
+	if err != nil {
+		return updateData, err
+	}
+
+	return updateData, nil
 }

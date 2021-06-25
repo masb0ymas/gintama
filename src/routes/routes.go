@@ -71,6 +71,7 @@ func SetupRoutes() *gin.Engine {
 		v1.GET("/role", roleController.GetAll)
 		v1.GET("/role/:id", roleController.FindById)
 		v1.POST("/role", roleController.CreateRole)
+		v1.PUT("/role/:id", roleController.Update)
 	}
 
 	log.Printf("\n\n PORT: %s \n ENV: %s", os.Getenv("PORT"), os.Getenv("ENV"))

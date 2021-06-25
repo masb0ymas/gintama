@@ -11,6 +11,7 @@ type IRepository interface {
 	GetAll(queryFiltered models.QueryFiltered) ([]models.Role, int64, error)
 	FindById(id int) (models.Role, error)
 	Create(role models.Role) (models.Role, error)
+	Update(role models.Role) (models.Role, error)
 }
 
 type repository struct {
@@ -63,6 +64,17 @@ func (r *repository) FindById(id int) (models.Role, error) {
 // Create
 func (r *repository) Create(data models.Role) (models.Role, error) {
 	err := r.db.Create(&data).Error
+
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
+// Update
+func (r *repository) Update(data models.Role) (models.Role, error) {
+	err := r.db.Save(&data).Error
 
 	if err != nil {
 		return data, err

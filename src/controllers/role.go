@@ -87,3 +87,36 @@ func (h *roleController) CreateRole(c *gin.Context) {
 	response := helpers.BuildResponse(http.StatusCreated, "success to create role", data)
 	c.JSON(http.StatusCreated, response)
 }
+
+// Update
+func (h *roleController) Update(c *gin.Context) {
+	var params schema.RoleByIdSchema
+	var input schema.RoleSchema
+
+	errUri := c.ShouldBindUri(&params)
+	if errUri != nil {
+		response := helpers.ErrorResponse(http.StatusBadRequest, "failed to get role")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helpers.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helpers.BuildResponse(http.StatusUnprocessableEntity, "failed to update role", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	updateData, err := h.service.Update(params, input)
+	if err != nil {
+		response := helpers.ErrorResponse(http.StatusBadRequest, "failed to update role")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helpers.BuildResponse(http.StatusOK, "success to update role", updateData)
+	c.JSON(http.StatusOK, response)
+}
