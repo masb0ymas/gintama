@@ -1,29 +1,53 @@
 package main
 
 import (
-	"gintama/src/models"
-	"gintama/src/routes"
 	"log"
-	"os"
+	"strconv"
 
-	"github.com/joho/godotenv"
+	"gintama/config"
+	"gintama/database"
+	"gintama/pkg/utils"
+	"gintama/routes"
+
+	helmet "github.com/danielkov/gin-helmet"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
+	"github.com/gin-contrib/requestid"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/ratelimit"
+)
+
+var (
+	dbname = config.Env("DB_DATABASE", "db_example")
+	rl, _  = strconv.Atoi(config.Env("APP_RATE_LIMIT", "10"))
+	port   = config.Env("APP_PORT", "8000")
 )
 
 func main() {
-	// Load the .env file
-	errEnv := godotenv.Load()
-	if errEnv != nil {
-		log.Fatal("Error loading .env file")
+	limit := ratelimit.New(rl)
+
+	// database instance
+	db, err := database.NewDatabase()
+	if err != nil {
+		log.Fatalf("error opening database: %v", err)
 	}
+	log.Printf("successfully connected to database %v", dbname)
 
-	port := os.Getenv("PORT")
+	app := gin.New()
 
-	// Initial Database
-	models.ConnectDatabase()
+	// default middleware
+	app.Use(cors.New(config.Cors()))
+	app.Use(gzip.Gzip(gzip.DefaultCompression))
+	app.Use(helmet.Default())
+	app.Use(utils.RateLimit(limit))
+	app.Use(requestid.New())
 
-	// Initial Routes
-	r := routes.SetupRoutes()
+	// static file
+	app.Static("/", "./public")
 
-	// Running App
-	r.Run(":" + port)
+	// register routes
+	routes.RegisterRoutes(app, db.GetDB())
+
+	// listening app
+	log.Fatal(app.Run(":" + port))
 }
