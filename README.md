@@ -29,7 +29,7 @@ Gintama is a production-ready REST API server built with Go, designed for high p
 ### Prerequisites
 
 - Go 1.24.5 or higher
-- PostgreSQL 12 or higher
+- PostgreSQL 18 or higher (using uuid v7)
 - Make (optional but recommended)
 
 ### Installation
@@ -59,7 +59,7 @@ export APP_NAME=gintama
 # Database connection
 export DB_DSN=postgres://postgres:postgres@localhost:5432/gintama?sslmode=disable
 
-# JWT secret (generate a secure random string)
+# JWT secret (generate a secure random string, with `openssl rand -base64 32`)
 export JWT_SECRET=your-secret-key-here
 
 # Application URLs
