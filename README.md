@@ -1,75 +1,235 @@
-# Gintama (Just Go Gin)
+# Gintama
 
-## Description
+> A high-performance REST API built with Go and Gin framework
 
-This repository contains the Rest API purpose. The code is written in Go.
+## 📋 Overview
 
-The server is designed to be high-performant and cost-effective. The code uses dependency injection as its main design.
+Gintama is a production-ready REST API server built with Go, designed for high performance and cost-effectiveness. The codebase follows clean architecture principles with dependency injection as its core design pattern.
 
-## Running the app locally
+### Key Features
 
-Create your own database name, and adjust db name on `/migrations/000001_initial-database.up.sql` file, search `dev_gintama` and replace it with your own database name.
+- **High Performance**: Built on the Gin web framework with optimized middleware
+- **Clean Architecture**: Dependency injection and separation of concerns
+- **Database Migrations**: Automated schema management with golang-migrate
+- **Security**: JWT authentication, Helmet middleware, CORS support
+- **Developer Experience**: Hot reload support, comprehensive Make commands
+- **Production Ready**: Docker support, cross-compilation, CI/CD ready
 
-In order to run the app, all the services have to be started.
+### Tech Stack
+
+- **Framework**: [Gin](https://github.com/gin-gonic/gin) v1.11.0
+- **Database**: PostgreSQL with [lib/pq](https://github.com/lib/pq)
+- **Migrations**: [golang-migrate](https://github.com/golang-migrate/migrate)
+- **Authentication**: JWT with [golang-jwt](https://github.com/golang-jwt/jwt)
+- **Email**: [Resend](https://resend.com) integration
+- **Middleware**: CORS, Gzip, Rate Limiting, Request ID, Helmet
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Go 1.24.5 or higher
+- PostgreSQL 12 or higher
+- Make (optional but recommended)
+
+### Installation
+
+1. **Clone the repository**
 
 ```bash
-# Run database migrations and seed test data
-$ make db/migrations/up/seed
+git clone https://github.com/masb0ymas/gintama.git
+cd gintama
 ```
 
-## Available commands
+2. **Set up environment variables**
 
 ```bash
-# List all commands
-$ make help
+cp .envrc.example .envrc
+```
 
-# Run the app
-$ make run
+Edit `.envrc` and configure your environment variables:
 
+```bash
+# Required configurations
+export PORT=8080
+export ENV=development
+export DEBUG=true
+export APP_NAME=gintama
+
+# Database connection
+export DB_DSN=postgres://postgres:postgres@localhost:5432/gintama?sslmode=disable
+
+# JWT secret (generate a secure random string)
+export JWT_SECRET=your-secret-key-here
+
+# Application URLs
+export CLIENT_URL=http://localhost:3000
+export SERVER_URL=http://localhost:8080
+
+# Optional: Email service (Resend)
+export RESEND_API_KEY=your-resend-api-key
+export RESEND_FROM_EMAIL=noreply@yourdomain.com
+```
+
+3. **Set up the database**
+
+Create your PostgreSQL database, then update the database name in `/migrations/000001_initial-database.up.sql` (search for `dev_gintama` and replace with your database name).
+
+4. **Run migrations and seed data**
+
+```bash
+make db/migrations/up/seed
+```
+
+5. **Start the application**
+
+```bash
+make run
+```
+
+The API will be available at `http://localhost:8080`
+
+## 📚 Available Commands
+
+### General
+
+```bash
+# List all available commands
+make help
+```
+
+### Development
+
+```bash
+# Run the application
+make run
+
+# Build the application
+make build/api
+```
+
+### Database
+
+```bash
 # Connect to the database using psql
-$ make db/psql
+make db/psql
 
 # Create a new database migration
-$ make db/migrations/new name=[name]
+make db/migrations/new name=create_users_table
 
-# Apply all up database migrations
-$ make db/migrations/up
+# Apply all pending migrations
+make db/migrations/up
 
-# Apply all up database migrations and seed
-$ make db/migrations/up/seed
+# Apply migrations and seed test data
+make db/migrations/up/seed
 
-# Apply all down database migrations
-$ make db/migrations/down
+# Rollback all migrations
+make db/migrations/down
 
-# Apply all refresh database migrations
-$ make db/migrations/refresh
+# Refresh database (down + up)
+make db/migrations/refresh
 
-# Apply all refresh database migrations and seed
-$ make db/migrations/refresh/seed
-
-# Build application
-$ make build/api
+# Refresh database with seed data
+make db/migrations/refresh/seed
 ```
 
-## Deployment
+## 🏗️ Project Structure
 
-You can setup GitHub Actions refer to `github/workflows` and push the registry to your container registry, like gcr, aws ecr, etc.
+```
+gintama/
+├── cmd/
+│   ├── api/          # API server entry point
+│   └── migrate/      # Migration CLI tool
+├── internal/         # Private application code
+│   ├── handlers/     # HTTP request handlers
+│   ├── models/       # Data models
+│   ├── repository/   # Data access layer
+│   └── services/     # Business logic
+├── migrations/       # Database migration files
+├── public/           # Static files
+├── script/           # Utility scripts
+├── templates/        # Email/HTML templates
+├── .envrc.example    # Environment variables template
+├── Dockerfile        # Container configuration
+├── Makefile          # Build and development commands
+└── go.mod            # Go module dependencies
+```
 
-### Manually
+## 🐳 Docker Support
+
+Build and run with Docker:
 
 ```bash
-# Build application
-$ make build/api
+# Build the Docker image
+docker build -t gintama:latest .
+
+# Run the container
+docker run -d -p 8080:8080 gintama:latest
 ```
 
-The command will generate two binaries:
+## 🚢 Deployment
 
-- **Local environment binary**
+### Automated Deployment
 
-  This binary is compiled for the host machine's achitecture. The binary can be found at `/bin/api`.
+Set up GitHub Actions by configuring the workflows in `.github/workflows`. The CI/CD pipeline can push images to:
 
-- **Server environment binary**
+- Google Container Registry (GCR)
+- AWS Elastic Container Registry (ECR)
+- Docker Hub
+- Any OCI-compatible registry
 
-  This binary is cross-compiled for Linux with amd64 architecture. The binary can be found at `/bin/linux_amd64/api`.
+### Manual Deployment
 
-You can then use the binary for deployment.
+Build the application for your target environment:
+
+```bash
+make build/api
+```
+
+This generates two binaries:
+
+- **`/bin/api`** - Compiled for your local machine's architecture
+- **`/bin/linux_amd64/api`** - Cross-compiled for Linux AMD64 (production servers)
+
+Deploy the appropriate binary to your server and run it with the required environment variables.
+
+### Environment Variables for Production
+
+Ensure these are properly configured in production:
+
+- `ENV=production`
+- `DEBUG=false`
+- `JWT_SECRET` - Use a strong, randomly generated secret
+- `DB_DSN` - Production database connection string
+- `CLIENT_URL` - Your frontend application URL
+- `SERVER_URL` - Your API server URL
+
+## 🔒 Security
+
+- JWT-based authentication
+- Helmet middleware for security headers
+- CORS configuration
+- Rate limiting support
+- Environment-based configuration
+- SQL injection protection via parameterized queries
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## 👤 Author
+
+GitHub: [@masb0ymas](https://github.com/masb0ymas)
+<br/>
+Email: [me@masb0ymas.com](mailto:me@masb0ymas.com)
+<br/>
+
+Credit: [@edwardanthony](https://github.com/edwardanthony)
+
+## ⭐ Show Your Support
+
+Give a ⭐️ if this project helped you!
