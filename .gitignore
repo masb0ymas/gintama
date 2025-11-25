@@ -1,17 +1,13 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Environment
+.envrc
+.env
 
-# testing
-/coverage
-
-# production
-/storage
-/dist
-/build
+# directory
 /tmp
+/build
+/dist
 
 # misc
+/coverage
+.idea
 .DS_Store
-.env
-.env.local
-.env.development
-.env.production
